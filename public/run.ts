@@ -1,4 +1,4 @@
-import { CommonExchangeAPI } from "../src/exchanges/multiexchange";
+import { CommonExchangeAPI } from "../src/index";
 
 export const getBalance = async (): Promise<any> => {
   try {

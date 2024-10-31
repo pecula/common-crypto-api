@@ -25,13 +25,11 @@ export const makeRequest = async (
       method,
       url,
       headers: { ...headers },
-      data: method === "post" ? data : undefined,
+      //   data: method === "post" ? data : undefined,
     });
 
     return response;
   } catch (error) {
-    throw error instanceof AxiosError
-      ? error
-      : new Error(`Unable to make ${method.toUpperCase()} request`);
+    throw error;
   }
 };

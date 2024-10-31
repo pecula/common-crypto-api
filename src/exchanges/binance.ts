@@ -56,7 +56,12 @@ export class Binance implements ExchangeInterface {
       const response = await makeRequest('post', url, {}, this.proxyUrl, headers);
       return response.data;
     } catch (error) {
-      throw error instanceof AxiosError ? error.message : 'Unable to set leverage';
+      if (error instanceof AxiosError && error.response) {
+        console.error('Error message:', error.response.data.msg);
+        throw new Error(error.response.data.msg);
+      } else {
+        throw error;
+      }
     }
   }
 

@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -31,11 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Binance = void 0;
 const axios_1 = require("axios");
 const axiosUtils_1 = require("../utils/axiosUtils");
-const crypto = __importStar(require("crypto-js"));
+const crypto_js_1 = __importDefault(require("crypto-js"));
 class Binance {
     constructor(apiKey, apiSecret, testnet, proxyUrl) {
         this.apiKey = apiKey;
@@ -49,7 +29,7 @@ class Binance {
         this.proxyUrl = proxyUrl;
     }
     generateSignature(queryString, apiSecret) {
-        return crypto.HmacSHA256(queryString, apiSecret).toString(crypto.enc.Hex);
+        return crypto_js_1.default.HmacSHA256(queryString, apiSecret).toString(crypto_js_1.default.enc.Hex);
     }
     getBalance() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -85,7 +65,13 @@ class Binance {
                 return response.data;
             }
             catch (error) {
-                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to set leverage';
+                if (error instanceof axios_1.AxiosError && error.response) {
+                    console.error('Error message:', error.response.data.msg);
+                    throw new Error(error.response.data.msg);
+                }
+                else {
+                    throw error;
+                }
             }
         });
     }
