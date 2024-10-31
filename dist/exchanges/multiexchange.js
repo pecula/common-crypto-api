@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MultiExchangeAPI = void 0;
+exports.CommonExchangeAPI = void 0;
 const binance_1 = require("./binance");
 const bybit_1 = require("./bybit");
-class MultiExchangeAPI {
+class CommonExchangeAPI {
     constructor(exchange, apiKey, apiSecret, testnet) {
         switch (exchange) {
             case "binance":
@@ -35,11 +35,6 @@ class MultiExchangeAPI {
             return yield this.exchange.fetchAllOrders();
         });
     }
-    getLeverage() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.exchange.getLeverage();
-        });
-    }
     setLeverage(symbol, leverage) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.exchange.setLeverage(symbol, leverage);
@@ -51,4 +46,4 @@ class MultiExchangeAPI {
         });
     }
 }
-exports.MultiExchangeAPI = MultiExchangeAPI;
+exports.CommonExchangeAPI = CommonExchangeAPI;

@@ -20,19 +20,15 @@ npm install common-crypto-api
 ### Importing the Module
 
 ```ts
-import { MultiExchangeAPI } from "common-crypto-api";
+import { CommonExchangeAPI } from "common-crypto-api";
 ```
 
 ### Creating an Instance
 
 ```ts
-const multiExchange = new MultiExchangeAPI(
+const multiExchange = new CommonExchangeAPI(
   "binance", // or "bybit"
- 
-
- "
-
-your-api-key",
+  "your-api-key",
   "your-api-secret",
   true // true for testnet, false for mainnet
 );

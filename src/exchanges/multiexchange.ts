@@ -3,7 +3,7 @@ import { Bybit } from "./bybit";
 
 type ExchangeType = "binance" | "bybit";
 
-export class MultiExchangeAPI {
+export class CommonExchangeAPI {
   private exchange: Binance | Bybit;
 
   constructor(
@@ -29,9 +29,6 @@ export class MultiExchangeAPI {
   }
   public async fetchAllOrders() {
     return await this.exchange.fetchAllOrders();
-  }
-  public async getLeverage() {
-    return await this.exchange.getLeverage();
   }
   public async setLeverage(symbol: string, leverage: number) {
     return await this.exchange.setLeverage(symbol, leverage);

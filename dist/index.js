@@ -9,17 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MultiExchangeAPI = void 0;
+exports.CommonExchangeAPI = void 0;
 const binance_1 = require("./exchanges/binance");
 const bybit_1 = require("./exchanges/bybit");
-class MultiExchangeAPI {
-    constructor(exchange, apiKey, apiSecret) {
+class CommonExchangeAPI {
+    constructor(exchange, apiKey, apiSecret, testnet, proxyUrl) {
         switch (exchange) {
             case "binance":
-                this.exchange = new binance_1.Binance(apiKey, apiSecret);
+                this.exchange = new binance_1.Binance(apiKey, apiSecret, testnet, proxyUrl);
                 break;
             case "bybit":
-                this.exchange = new bybit_1.Bybit(apiKey, apiSecret);
+                this.exchange = new bybit_1.Bybit(apiKey, apiSecret, testnet, proxyUrl);
                 break;
             default:
                 throw new Error("Unsupported exchange");
@@ -30,10 +30,15 @@ class MultiExchangeAPI {
             return yield this.exchange.getBalance();
         });
     }
+    setLeverage(symbol, leverage) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.exchange.setLeverage(symbol, leverage);
+        });
+    }
     placeOrder(pair, type, side, amount, price, params) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.exchange.placeOrder(pair, type, side, amount, price, params);
         });
     }
 }
-exports.MultiExchangeAPI = MultiExchangeAPI;
+exports.CommonExchangeAPI = CommonExchangeAPI;

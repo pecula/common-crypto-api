@@ -1,13 +1,7 @@
 export interface ExchangeInterface {
-  placeOrder(
-    pair: string,
-    type: "market" | "limit",
-    side: "buy" | "sell",
-    amount: number,
-    price?: number,
-    params?: Object
-  ): Promise<any>;
+  placeOrder(pair: string, type: 'market' | 'limit', side: 'buy' | 'sell', amount: number, price?: number, params?: Object): Promise<any>;
   getBalance(): Promise<any>;
+  setLeverage(symbol: string, leverage: number): Promise<any>;
 }
 
 export interface BalanceResponse {

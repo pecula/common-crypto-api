@@ -33,65 +33,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Binance = void 0;
-const axios_1 = __importStar(require("axios"));
+const axios_1 = require("axios");
+const axiosUtils_1 = require("../utils/axiosUtils");
 const crypto = __importStar(require("crypto-js"));
 class Binance {
-    constructor(apiKey, apiSecret, testnet) {
+    constructor(apiKey, apiSecret, testnet, proxyUrl) {
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
         if (testnet) {
-            this.baseUrl = "https://testnet.binancefuture.com/fapi";
+            this.baseUrl = 'https://testnet.binancefuture.com/fapi';
         }
         else {
-            this.baseUrl = "https://api.binance.com/api/v3/account";
+            this.baseUrl = 'https://fapi.binance.com';
         }
+        this.proxyUrl = proxyUrl;
+    }
+    generateSignature(queryString, apiSecret) {
+        return crypto.HmacSHA256(queryString, apiSecret).toString(crypto.enc.Hex);
     }
     getBalance() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const timestamp = Date.now();
+                const endpoint = '/fapi/v3/balance';
                 const queryString = `timestamp=${timestamp}`;
-                // Generate HMAC SHA256 signature
-                const signature = crypto
-                    .HmacSHA256(queryString, this.apiSecret)
-                    .toString(crypto.enc.Hex);
-                this.baseUrl = `${this.baseUrl}/v3/balance?${queryString}&signature=${signature}`;
-                // Add logic to fetch the balance from Binance
-                const response = yield axios_1.default.get(`${this.baseUrl}`, {
-                    headers: {
-                        "X-MBX-APIKEY": this.apiKey,
-                    },
-                });
+                const signature = this.generateSignature(queryString, this.apiSecret);
+                const url = `${this.baseUrl}${endpoint}?${queryString}&signature=${signature}`;
+                const headers = {
+                    'X-MBX-APIKEY': this.apiKey,
+                };
+                const response = yield (0, axiosUtils_1.makeRequest)('get', url, {}, this.proxyUrl, headers);
                 return response.data;
             }
             catch (error) {
-                throw error instanceof axios_1.AxiosError
-                    ? error.message
-                    : "unable to fetch balance";
-            }
-        });
-    }
-    getLeverage() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const timestamp = Date.now();
-                const queryString = `timestamp=${timestamp}`;
-                // Generate HMAC SHA256 signature
-                const signature = crypto
-                    .HmacSHA256(queryString, this.apiSecret)
-                    .toString(crypto.enc.Hex);
-                this.baseUrl = `${this.baseUrl}/v1/leverageBracket?${queryString}&signature=${signature}`;
-                const response = yield axios_1.default.get(`${this.baseUrl}`, {
-                    headers: {
-                        "X-MBX-APIKEY": this.apiKey,
-                    },
-                });
-                return response.data;
-            }
-            catch (error) {
-                throw error instanceof axios_1.AxiosError
-                    ? error.message
-                    : "unable to fetch leverage";
+                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to fetch balance';
             }
         });
     }
@@ -99,22 +74,18 @@ class Binance {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const timestamp = Date.now();
-                const queryString = `symbol=${symbol}&leverage=${leverage}&timestamp=${timestamp}`;
-                // Generate HMAC SHA256 signature
-                const signature = crypto
-                    .HmacSHA256(queryString, this.apiSecret)
-                    .toString(crypto.enc.Hex);
-                this.baseUrl = `${this.baseUrl}/v1/leverage?${queryString}&signature=${signature}`;
-                console.log(this.baseUrl);
-                const response = yield axios_1.default.post(this.baseUrl, {}, {
-                    headers: {
-                        "X-MBX-APIKEY": this.apiKey,
-                    },
-                });
+                const endpoint = '/fapi/v1/leverage';
+                let queryString = `symbol=${symbol}&leverage=${leverage}&timestamp=${timestamp}`;
+                const signature = this.generateSignature(queryString, this.apiSecret);
+                const url = `${this.baseUrl}${endpoint}?${queryString}&signature=${signature}`;
+                const headers = {
+                    'X-MBX-APIKEY': this.apiKey,
+                };
+                const response = yield (0, axiosUtils_1.makeRequest)('post', url, {}, this.proxyUrl, headers);
                 return response.data;
             }
             catch (error) {
-                throw error instanceof axios_1.AxiosError ? error : "unable to set leverage";
+                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to set leverage';
             }
         });
     }
@@ -123,23 +94,16 @@ class Binance {
             try {
                 const timestamp = Date.now();
                 const queryString = `timestamp=${timestamp}`;
-                // Generate HMAC SHA256 signature
-                const signature = crypto
-                    .HmacSHA256(queryString, this.apiSecret)
-                    .toString(crypto.enc.Hex);
-                this.baseUrl = `${this.baseUrl}/v1/allOrders?${queryString}&signature=${signature}`;
-                // Add logic to fetch the balance from Binance
-                const response = yield axios_1.default.get(`${this.baseUrl}`, {
-                    headers: {
-                        "X-MBX-APIKEY": this.apiKey,
-                    },
-                });
+                const signature = this.generateSignature(queryString, this.apiSecret);
+                const url = `${this.baseUrl}/v1/allOrders?${queryString}&signature=${signature}`;
+                const headers = {
+                    'X-MBX-APIKEY': this.apiKey,
+                };
+                const response = yield (0, axiosUtils_1.makeRequest)('get', url, {}, this.proxyUrl, headers);
                 return response.data;
             }
             catch (error) {
-                throw error instanceof axios_1.AxiosError
-                    ? error.message
-                    : "unable to fetch all orders";
+                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to fetch all orders';
             }
         });
     }
@@ -148,18 +112,15 @@ class Binance {
             try {
                 const timestamp = Date.now();
                 const queryString = `symbol=${pair}&side=${side}&quantity=${amount}&timestamp=${timestamp}`;
-                const signature = crypto
-                    .HmacSHA256(queryString, this.apiSecret)
-                    .toString(crypto.enc.Hex);
-                // Add logic to place an order on Binance
-                return yield axios_1.default.post(`${this.baseUrl}/api/v1/order`, {}, {
-                    headers: {
-                        "X-MBX-APIKEY": this.apiKey,
-                    },
-                });
+                const signature = this.generateSignature(queryString, this.apiSecret);
+                const url = `${this.baseUrl}/api/v1/order?${queryString}&signature=${signature}`;
+                const headers = {
+                    'X-MBX-APIKEY': this.apiKey,
+                };
+                return yield (0, axiosUtils_1.makeRequest)('post', url, {}, this.proxyUrl, headers);
             }
             catch (error) {
-                throw error instanceof axios_1.AxiosError ? error : "unable to place order";
+                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to place order';
             }
         });
     }
