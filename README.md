@@ -7,7 +7,8 @@ common-crypto-api is a Node.js package that provides a unified API to interact w
 - Unified API for multiple exchanges
 - Supports Binance and Bybit exchanges
 - Fetch balance, leverage, orders, and place orders
-- Testnet support for Bybit
+- Testnet support for exchange
+- Proxy URL support for exchange ratelimit
 
 ## Installation
 
@@ -26,7 +27,7 @@ import { CommonExchangeAPI } from "common-crypto-api";
 ### Creating an Instance
 
 ```ts
-const multiExchange = new CommonExchangeAPI(
+const commonExchangeAPI = new CommonExchangeAPI(
   "binance", // or "bybit"
   "your-api-key",
   "your-api-secret",
@@ -37,35 +38,35 @@ const multiExchange = new CommonExchangeAPI(
 ### Fetching Balance
 
 ```ts
-const balance = await multiExchange.getBalance();
+const balance = await commonExchangeAPI.getBalance();
 console.log(balance);
 ```
 
 ### Fetching All Orders
 
 ```ts
-const orders = await multiExchange.fetchAllOrders();
+const orders = await commonExchangeAPI.fetchAllOrders();
 console.log(orders);
 ```
 
 ### Fetching Leverage
 
 ```ts
-const leverage = await multiExchange.getLeverage();
+const leverage = await commonExchangeAPI.getLeverage();
 console.log(leverage);
 ```
 
 ### Setting Leverage
 
 ```ts
-const response = await multiExchange.setLeverage("BTCUSDT", 10);
+const response = await commonExchangeAPI.setLeverage("BTCUSDT", 10);
 console.log(response);
 ```
 
 ### Placing an Order
 
 ```ts
-const order = await multiExchange.placeOrder(
+const order = await commonExchangeAPI.placeOrder(
   "BTCUSDT",
   "limit",
   "buy",

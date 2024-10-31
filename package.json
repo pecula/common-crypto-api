@@ -1,6 +1,6 @@
 {
   "name": "common-crypto-api",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Node.js package to handle multiple crypto exchange APIs into a single API",
   "main": "dist/index.js",
   "scripts": {
