@@ -93,7 +93,7 @@ export class Bybit implements ExchangeInterface {
       const response = await makeRequest('get', url, {}, this.proxyUrl);
       return response.data;
     } catch (error) {
-      throw error instanceof AxiosError ? error.message : 'Unable to fetch positions';
+      throw error instanceof AxiosError ? error.response?.data : error;
     }
   }
 
