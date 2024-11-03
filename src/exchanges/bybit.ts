@@ -110,4 +110,45 @@ export class Bybit implements ExchangeInterface {
       throw error instanceof AxiosError ? error.message : 'Unable to place order';
     }
   }
+
+    // mode: 'true' for Hedge Mode, 'false' for One-way Mode
+    public async setPositionMode(mode: 'true' | 'false', symbol: string): Promise<any> {
+      try {
+        const timestamp = Date.now();
+        const endpoint = '/fapi/v1/positionSide/dual';
+        const params = { 
+          api_key: this.apiKey, 
+          symbol, 
+          mode,
+          timestamp: timestamp.toString() 
+        };
+        const signature = this.generateSignature(params);
+        const url = `${this.baseUrl}${endpoint}?${new URLSearchParams(params).toString()}&sign=${signature}`;
+        const headers = {
+          'X-MBX-APIKEY': this.apiKey,
+        };
+  
+        const response = await makeRequest('post', url, {}, this.proxyUrl, headers);
+        return response.data;
+      } catch (error) {
+        throw error instanceof AxiosError ? error.message : 'Unable to set position mode';
+      }
+    }
+
+    public async setMarginMode(mode: string, symbol: string): Promise<any> {
+      try {
+        const timestamp = Date.now();
+        const params = { api_key: this.apiKey, symbol, mode, timestamp: timestamp.toString() };
+        const signature = this.generateSignature(params);
+        const url = `${this.baseUrl}/v2/private/position/switch-isolated?${new URLSearchParams(params).toString()}&sign=${signature}`;
+        const headers = {
+          'X-MBX-APIKEY': this.apiKey,
+        };
+  
+        const response = await makeRequest("post", url, {}, this.proxyUrl, headers);
+        return response.data;
+      } catch (error) {
+        throw error instanceof AxiosError ? error.message : "Unable to set margin mode";
+      }
+    }
 }

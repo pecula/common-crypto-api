@@ -51,4 +51,12 @@ export class CommonExchangeAPI {
       params
     );
   }
+
+   public async setPositionMode(mode: 'true' | 'false', symbol: string) {
+    return await this.exchange.setPositionMode(mode, symbol);
+  }
+
+  public async setMarginMode(mode: 'isolated' | 'cross', symbol: string) {
+    return await this.exchange.setMarginMode(mode, symbol);
+  }
 }

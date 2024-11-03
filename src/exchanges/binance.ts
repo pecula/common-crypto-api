@@ -38,7 +38,7 @@ export class Binance implements ExchangeInterface {
       const response = await makeRequest('get', url, {}, this.proxyUrl, headers);
       return response.data;
     } catch (error) {
-      throw error instanceof AxiosError ? error.message : 'Unable to fetch balance';
+      throw error instanceof AxiosError ? error.response?.data : error;
     }
   }
 
@@ -60,7 +60,7 @@ export class Binance implements ExchangeInterface {
         console.error('Error message:', error.response.data.msg);
         throw new Error(error.response.data.msg);
       } else {
-        throw error;
+        throw error instanceof AxiosError ? error.response?.data : error;
       }
     }
   }
@@ -78,7 +78,7 @@ export class Binance implements ExchangeInterface {
       const response = await makeRequest('get', url, {}, this.proxyUrl, headers);
       return response.data;
     } catch (error) {
-      throw error instanceof AxiosError ? error.message : 'Unable to fetch all orders';
+      throw error instanceof AxiosError ? error.response?.data : error;
     }
   }
 
@@ -91,17 +91,69 @@ export class Binance implements ExchangeInterface {
     params?: Object,
   ): Promise<AxiosResponse<OrderResponse>> {
     try {
+      const sideCase = side.toUpperCase();
       const timestamp = Date.now();
-      const queryString = `symbol=${pair}&side=${side}&quantity=${amount}&timestamp=${timestamp}`;
+      let queryString = `symbol=${pair}&side=${sideCase}&type=${type}&quantity=${amount}&timestamp=${timestamp}`;
+      if (type == 'limit') {
+        if (price) {
+          queryString += `&price=${price}`;
+        } else {
+          throw new Error('Price is required for limit orders');
+        }
+      }
+      if (params) {
+        for (const [key, value] of Object.entries(params)) {
+          queryString += `&${key}=${value}`;
+        }
+      }
       const signature = this.generateSignature(queryString, this.apiSecret);
-      const url = `${this.baseUrl}/api/v1/order?${queryString}&signature=${signature}`;
+      const url = `${this.baseUrl}/fapi/v1/order?${queryString}&signature=${signature}`;
       const headers = {
         'X-MBX-APIKEY': this.apiKey,
       };
 
       return await makeRequest('post', url, {}, this.proxyUrl, headers);
     } catch (error) {
-      throw error instanceof AxiosError ? error.message : 'Unable to place order';
+      throw error instanceof AxiosError ? error.response?.data : error;
+    }
+  }
+
+  // mode: 'true' for Hedge Mode, 'false' for One-way Mode
+  public async setPositionMode(mode: 'true' | 'false', symbol: string): Promise<any> {
+    try {
+      const timestamp = Date.now();
+      const endpoint = '/fapi/v1/positionSide/dual';
+      const queryString = `symbol=${symbol}&dualSidePosition=${mode}&timestamp=${timestamp}`;
+      const signature = this.generateSignature(queryString, this.apiSecret);
+      const url = `${this.baseUrl}${endpoint}?${queryString}&signature=${signature}`;
+      const headers = {
+        'X-MBX-APIKEY': this.apiKey,
+      };
+
+      const response = await makeRequest('post', url, {}, this.proxyUrl, headers);
+      return response.data;
+    } catch (error) {
+      throw error instanceof AxiosError ? error.response?.data : error;
+    }
+  }
+
+  public async setMarginMode(mode: string, symbol: string): Promise<any> {
+    try {
+      const timestamp = Date.now();
+      const modeCase = mode == 'cross'? 'CROSSED' : mode.toUpperCase();
+      const endpoint = "/fapi/v1/marginType";
+      const queryString = `symbol=${symbol}&marginType=${modeCase}&timestamp=${timestamp}`;
+      const signature = this.generateSignature(queryString, this.apiSecret);
+      const url = `${this.baseUrl}${endpoint}?${queryString}&signature=${signature}`;
+      const headers = {
+        'X-MBX-APIKEY': this.apiKey,
+      };
+
+
+      const response = await makeRequest("post", url, {}, this.proxyUrl, headers);
+      return response.data;
+    } catch (error) {
+      throw error instanceof AxiosError ? error.response?.data : error;
     }
   }
 }
