@@ -173,8 +173,27 @@ class Binance {
                     'X-MBX-APIKEY': this.apiKey,
                 };
                 const response = yield (0, axiosUtils_1.makeRequest)('get', url, {}, this.proxyUrl, headers);
-                // return response.data;
-                // console.log(response.data);
+                // Example response:
+                //   {
+                //     "symbol": "ETHUSDT",
+                //     "positionAmt": "-0.010",
+                //     "entryPrice": "2468.49",
+                //     "breakEvenPrice": "2467.255755",
+                //     "markPrice": "2473.15992704",
+                //     "unRealizedProfit": "-0.04669927",
+                //     "liquidationPrice": "2949.15712649",
+                //     "leverage": "5",
+                //     "maxNotionalValue": "320000000",
+                //     "marginType": "isolated",
+                //     "isolatedMargin": "4.87793828",
+                //     "isAutoAddMargin": "false",
+                //     "positionSide": "SHORT",
+                //     "notional": "-24.73159927",
+                //     "isolatedWallet": "4.92463755",
+                //     "updateTime": "1730667935892",
+                //     "isolated": true,
+                //     "adlQuantile": "1"
+                // }
                 const result = [];
                 for (let i = 0; i < response.data.length; i++) {
                     const parsed = this.parsePosition(response.data[i]);
@@ -186,7 +205,6 @@ class Binance {
             }
             catch (error) {
                 throw error instanceof axios_1.AxiosError ? (_a = error.response) === null || _a === void 0 ? void 0 : _a.data : error;
-                // throw error instanceof AxiosError ? error.message : 'Unable to fetch positions';
             }
         });
     }

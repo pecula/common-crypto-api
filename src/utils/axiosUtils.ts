@@ -1,5 +1,5 @@
 // src/utils/axiosUtils.ts
-import axios, { AxiosResponse, AxiosError } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { HttpsProxyAgent } from "https-proxy-agent";
 
 
