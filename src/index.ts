@@ -33,6 +33,9 @@ export class CommonExchangeAPI {
   public async setLeverage(symbol: string, leverage: number) {
     return await this.exchange.setLeverage(symbol, leverage);
   }
+  public async fetchPositions() {
+    return await this.exchange.fetchPositions();
+  }
 
   public async placeOrder(
     pair: string,

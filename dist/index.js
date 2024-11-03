@@ -35,6 +35,11 @@ class CommonExchangeAPI {
             return yield this.exchange.setLeverage(symbol, leverage);
         });
     }
+    fetchPositions() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.exchange.fetchPositions();
+        });
+    }
     placeOrder(pair, type, side, amount, price, params) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.exchange.placeOrder(pair, type, side, amount, price, params);

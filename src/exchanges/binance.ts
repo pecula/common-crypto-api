@@ -1,5 +1,5 @@
 import { AxiosResponse, AxiosError } from 'axios';
-import { ExchangeInterface, OrderResponse } from './ExchangeInterface';
+import { ExchangeInterface, OrderResponse, PositionResponse } from './ExchangeInterface';
 import { makeRequest } from '../utils/axiosUtils';
 import * as crypto from 'crypto-js';
 
@@ -13,7 +13,7 @@ export class Binance implements ExchangeInterface {
     this.apiKey = apiKey;
     this.apiSecret = apiSecret;
     if (testnet) {
-      this.baseUrl = 'https://testnet.binancefuture.com/fapi';
+      this.baseUrl = 'https://testnet.binancefuture.com';
     } else {
       this.baseUrl = 'https://fapi.binance.com';
     }
@@ -79,6 +79,29 @@ export class Binance implements ExchangeInterface {
       return response.data;
     } catch (error) {
       throw error instanceof AxiosError ? error.response?.data : error;
+    }
+  }
+  public async fetchPositions(): Promise<Object[]> {
+    try {
+      const timestamp = Date.now();
+      const endpoint = '/fapi/v2/positionRisk';
+      const queryString = `timestamp=${timestamp}`;
+      const signature = this.generateSignature(queryString, this.apiSecret);
+      const url = `${this.baseUrl}${endpoint}?${queryString}&signature=${signature}`;
+      const headers = {
+        'X-MBX-APIKEY': this.apiKey,
+      };
+
+      const response = await makeRequest('get', url, {}, this.proxyUrl, headers);
+      // return response.data;
+      const positions: PositionResponse[] = response.data.map((position: PositionResponse) => ({
+        symbol: position.symbol,
+        positionSide: position.positionSide,
+      }));
+      return positions;
+    } catch (error) {
+      throw error instanceof AxiosError ? error.response?.data : error;
+      // throw error instanceof AxiosError ? error.message : 'Unable to fetch positions';
     }
   }
 
