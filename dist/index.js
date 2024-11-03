@@ -9,9 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommonExchangeAPI = void 0;
+exports.CommonExchangeAPI = exports.exchanges = void 0;
 const binance_1 = require("./exchanges/binance");
 const bybit_1 = require("./exchanges/bybit");
+exports.exchanges = ["binance", "bybit"];
 class CommonExchangeAPI {
     constructor(exchange, apiKey, apiSecret, testnet, proxyUrl) {
         switch (exchange) {
@@ -40,9 +41,9 @@ class CommonExchangeAPI {
             return yield this.exchange.fetchPositions();
         });
     }
-    placeOrder(pair, type, side, amount, price, params) {
+    createOrder(pair, type, side, amount, price, params) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.exchange.placeOrder(pair, type, side, amount, price, params);
+            return yield this.exchange.createOrder(pair, type, side, amount, price, params);
         });
     }
     setPositionMode(mode, symbol) {

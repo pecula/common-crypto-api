@@ -38,21 +38,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var multiexchange_1 = require("../src/exchanges/multiexchange");
 var getBalance = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var multiExchange, response, error_1;
+    var commonExchangeAPI, response, error_1;
     return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0:
-                _a.trys.push([0, 2, , 3]);
-                multiExchange = new multiexchange_1.CommonExchangeAPI("binance", "a420fefe7d78a366a3daab941cfc181f88e03ac3daccb4b9c5456823557c4e50", "ac649a0c10c9a1d3ddc92bf49622a6467ab1b3b9a6b0a175c75df0784c917e89", true);
-                return [4 /*yield*/, multiExchange.getBalance()];
-            case 1:
-                response = _a.sent();
-                return [2 /*return*/, response];
-            case 2:
-                error_1 = _a.sent();
-                return [2 /*return*/, error_1];
-            case 3: return [2 /*return*/];
-        }
+      switch (_a.label) {
+        case 0:
+          _a.trys.push([0, 2, , 3]);
+          commonExchangeAPI = new multiexchange_1.CommonExchangeAPI(
+            'binance',
+            'a420fefe7d78a366a3daab941cfc181f88e03ac3daccb4b9c5456823557c4e50',
+            'ac649a0c10c9a1d3ddc92bf49622a6467ab1b3b9a6b0a175c75df0784c917e89',
+            true,
+          );
+          return [4 /*yield*/, commonExchangeAPI.getBalance()];
+        case 1:
+          response = _a.sent();
+          return [2 /*return*/, response];
+        case 2:
+          error_1 = _a.sent();
+          return [2 /*return*/, error_1];
+        case 3:
+          return [2 /*return*/];
+      }
     });
 }); };
 console.log(getBalance());

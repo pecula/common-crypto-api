@@ -116,6 +116,50 @@ class Binance {
             }
         });
     }
+    parsePosition(position) {
+        const entryPrice = position.entryPrice;
+        if (entryPrice === '0' || entryPrice === '0.0' || entryPrice === '0.00000000') {
+            return null;
+        }
+        const notional = Math.abs(parseFloat(position.notional));
+        const contracts = parseFloat(position.positionAmt);
+        const unrealizedPnl = parseFloat(position.unRealizedProfit);
+        const leverage = parseInt(position.leverage);
+        const liquidationPrice = parseFloat(position.liquidationPrice);
+        const entryPriceFloat = parseFloat(position.entryPrice);
+        const markPrice = parseFloat(position.markPrice);
+        const collateral = Math.abs((contracts * entryPriceFloat) / leverage);
+        const initialMargin = (contracts * entryPriceFloat) / leverage;
+        const maintenanceMargin = contracts * markPrice * 0.004;
+        const marginRatio = maintenanceMargin / collateral;
+        const percentage = (unrealizedPnl / initialMargin) * 100;
+        const timestamp = parseInt(position.updateTime);
+        return {
+            info: position,
+            symbol: `${position.symbol.slice(0, -4)}/${position.symbol.slice(-4)}:USDT`,
+            contracts,
+            contractSize: 1,
+            unrealizedPnl,
+            leverage,
+            liquidationPrice,
+            collateral,
+            notional,
+            markPrice,
+            entryPrice: entryPriceFloat,
+            timestamp,
+            initialMargin,
+            initialMarginPercentage: 1 / leverage,
+            maintenanceMargin,
+            maintenanceMarginPercentage: 0.004,
+            marginRatio,
+            datetime: new Date(timestamp).toISOString(),
+            marginMode: position.marginType,
+            marginType: position.marginType,
+            side: position.positionSide.toLowerCase(),
+            hedged: true,
+            percentage,
+        };
+    }
     fetchPositions() {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -130,11 +174,15 @@ class Binance {
                 };
                 const response = yield (0, axiosUtils_1.makeRequest)('get', url, {}, this.proxyUrl, headers);
                 // return response.data;
-                const positions = response.data.map((position) => ({
-                    symbol: position.symbol,
-                    positionSide: position.positionSide,
-                }));
-                return positions;
+                // console.log(response.data);
+                const result = [];
+                for (let i = 0; i < response.data.length; i++) {
+                    const parsed = this.parsePosition(response.data[i]);
+                    if (parsed !== null) {
+                        result.push(parsed);
+                    }
+                }
+                return result;
             }
             catch (error) {
                 throw error instanceof axios_1.AxiosError ? (_a = error.response) === null || _a === void 0 ? void 0 : _a.data : error;
@@ -142,7 +190,7 @@ class Binance {
             }
         });
     }
-    placeOrder(pair, type, side, amount, price, params) {
+    createOrder(pair, type, side, amount, price, params) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
@@ -201,14 +249,14 @@ class Binance {
             try {
                 const timestamp = Date.now();
                 const modeCase = mode == 'cross' ? 'CROSSED' : mode.toUpperCase();
-                const endpoint = "/fapi/v1/marginType";
+                const endpoint = '/fapi/v1/marginType';
                 const queryString = `symbol=${symbol}&marginType=${modeCase}&timestamp=${timestamp}`;
                 const signature = this.generateSignature(queryString, this.apiSecret);
                 const url = `${this.baseUrl}${endpoint}?${queryString}&signature=${signature}`;
                 const headers = {
                     'X-MBX-APIKEY': this.apiKey,
                 };
-                const response = yield (0, axiosUtils_1.makeRequest)("post", url, {}, this.proxyUrl, headers);
+                const response = yield (0, axiosUtils_1.makeRequest)('post', url, {}, this.proxyUrl, headers);
                 return response.data;
             }
             catch (error) {

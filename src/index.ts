@@ -5,6 +5,8 @@ import { OrderResponse } from "./exchanges/ExchangeInterface";
 
 type ExchangeType = "binance" | "bybit";
 
+export const exchanges = ["binance", "bybit"];
+
 export class CommonExchangeAPI {
   private exchange: Binance | Bybit;
 
@@ -37,7 +39,7 @@ export class CommonExchangeAPI {
     return await this.exchange.fetchPositions();
   }
 
-  public async placeOrder(
+  public async createOrder(
     pair: string,
     type: "market" | "limit",
     side: "buy" | "sell",
@@ -45,7 +47,7 @@ export class CommonExchangeAPI {
     price: number,
     params?: Object
   ): Promise<AxiosResponse<OrderResponse>> {
-    return await this.exchange.placeOrder(
+    return await this.exchange.createOrder(
       pair,
       type,
       side,

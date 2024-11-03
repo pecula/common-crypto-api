@@ -97,7 +97,7 @@ export class Bybit implements ExchangeInterface {
     }
   }
 
-  public async placeOrder(
+  public async createOrder(
     symbol: string,
     type: 'market' | 'limit',
     side: string,

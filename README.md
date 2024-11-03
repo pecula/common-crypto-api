@@ -66,7 +66,7 @@ console.log(response);
 ### Placing an Order
 
 ```ts
-const order = await commonExchangeAPI.placeOrder(
+const order = await commonExchangeAPI.createOrder(
   "BTCUSDT",
   "limit",
   "buy",

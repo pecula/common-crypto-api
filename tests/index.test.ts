@@ -43,23 +43,17 @@ describe("CommonExchangeAPI", () => {
     const mockResponse = { balance: 1000 };
     Binance.prototype.getBalance = jest.fn().mockResolvedValue(mockResponse);
 
-    const multiExchange = new CommonExchangeAPI("binance", apiKey, apiSecret);
-    const result = await multiExchange.getBalance();
+    const commonExchangeAPI = new CommonExchangeAPI('binance', apiKey, apiSecret);
+    const result = await commonExchangeAPI.getBalance();
     expect(result).toEqual(mockResponse);
   });
 
-  test("placeOrder should place order on Binance", async () => {
-    const mockResponse = { orderId: "12345" };
-    Binance.prototype.placeOrder = jest.fn().mockResolvedValue(mockResponse);
+  test('createOrder should place order on Binance', async () => {
+    const mockResponse = { orderId: '12345' };
+    Binance.prototype.createOrder = jest.fn().mockResolvedValue(mockResponse);
 
-    const multiExchange = new CommonExchangeAPI("binance", apiKey, apiSecret);
-    const result = await multiExchange.placeOrder(
-      "BTCUSD",
-      "limit",
-      "buy",
-      1,
-      50000
-    );
+    const commonExchangeAPI = new CommonExchangeAPI('binance', apiKey, apiSecret);
+    const result = await commonExchangeAPI.createOrder('BTCUSD', 'limit', 'buy', 1, 50000);
     expect(result).toEqual(mockResponse);
   });
 });
