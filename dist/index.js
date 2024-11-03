@@ -40,5 +40,15 @@ class CommonExchangeAPI {
             return yield this.exchange.placeOrder(pair, type, side, amount, price, params);
         });
     }
+    setPositionMode(mode, symbol) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.exchange.setPositionMode(mode, symbol);
+        });
+    }
+    setMarginMode(mode, symbol) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.exchange.setMarginMode(mode, symbol);
+        });
+    }
 }
 exports.CommonExchangeAPI = CommonExchangeAPI;

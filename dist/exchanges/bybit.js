@@ -133,5 +133,48 @@ class Bybit {
             }
         });
     }
+    // mode: 'true' for Hedge Mode, 'false' for One-way Mode
+    setPositionMode(mode, symbol) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const timestamp = Date.now();
+                const endpoint = '/fapi/v1/positionSide/dual';
+                const params = {
+                    api_key: this.apiKey,
+                    symbol,
+                    mode,
+                    timestamp: timestamp.toString()
+                };
+                const signature = this.generateSignature(params);
+                const url = `${this.baseUrl}${endpoint}?${new URLSearchParams(params).toString()}&sign=${signature}`;
+                const headers = {
+                    'X-MBX-APIKEY': this.apiKey,
+                };
+                const response = yield (0, axiosUtils_1.makeRequest)('post', url, {}, this.proxyUrl, headers);
+                return response.data;
+            }
+            catch (error) {
+                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to set position mode';
+            }
+        });
+    }
+    setMarginMode(mode, symbol) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const timestamp = Date.now();
+                const params = { api_key: this.apiKey, symbol, mode, timestamp: timestamp.toString() };
+                const signature = this.generateSignature(params);
+                const url = `${this.baseUrl}/v2/private/position/switch-isolated?${new URLSearchParams(params).toString()}&sign=${signature}`;
+                const headers = {
+                    'X-MBX-APIKEY': this.apiKey,
+                };
+                const response = yield (0, axiosUtils_1.makeRequest)("post", url, {}, this.proxyUrl, headers);
+                return response.data;
+            }
+            catch (error) {
+                throw error instanceof axios_1.AxiosError ? error.message : "Unable to set margin mode";
+            }
+        });
+    }
 }
 exports.Bybit = Bybit;
