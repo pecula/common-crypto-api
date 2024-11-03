@@ -83,6 +83,19 @@ export class Bybit implements ExchangeInterface {
       throw error instanceof AxiosError ? error.message : 'Unable to fetch all orders';
     }
   }
+  public async fetchPositions(): Promise<Object[]> {
+    try {
+      const timestamp = Date.now();
+      const params = { api_key: this.apiKey, timestamp: timestamp.toString() };
+      const signature = this.generateSignature(params);
+      const url = `${this.baseUrl}/v2/private/position/list?${new URLSearchParams(params).toString()}&sign=${signature}`;
+
+      const response = await makeRequest('get', url, {}, this.proxyUrl);
+      return response.data;
+    } catch (error) {
+      throw error instanceof AxiosError ? error.message : 'Unable to fetch positions';
+    }
+  }
 
   public async placeOrder(
     symbol: string,

@@ -11,3 +11,7 @@ export interface BalanceResponse {
 export interface OrderResponse {
   // Add any fields you expect from the order placement response
 }
+export interface PositionResponse {
+  symbol: string
+  positionSide: string
+}
