@@ -207,7 +207,8 @@ export class Binance implements ExchangeInterface {
         'X-MBX-APIKEY': this.apiKey,
       };
 
-      return await makeRequest('post', url, {}, this.proxyUrl, headers);
+      const response = await makeRequest('post', url, {}, this.proxyUrl, headers);
+      return response.data;
     } catch (error) {
       throw error instanceof AxiosError ? error.response?.data : error;
     }

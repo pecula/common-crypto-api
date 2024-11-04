@@ -233,7 +233,8 @@ class Binance {
                 const headers = {
                     'X-MBX-APIKEY': this.apiKey,
                 };
-                return yield (0, axiosUtils_1.makeRequest)('post', url, {}, this.proxyUrl, headers);
+                const response = yield (0, axiosUtils_1.makeRequest)('post', url, {}, this.proxyUrl, headers);
+                return response.data;
             }
             catch (error) {
                 throw error instanceof axios_1.AxiosError ? (_a = error.response) === null || _a === void 0 ? void 0 : _a.data : error;
