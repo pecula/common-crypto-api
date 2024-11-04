@@ -1,6 +1,6 @@
 {
   "name": "common-crypto-api",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Node.js package to handle multiple crypto exchange APIs into a single API",
   "main": "dist/index.js",
   "scripts": {
@@ -19,12 +19,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/common-crypto-api.git"
+    "url": "https://github.com/pecula/common-crypto-api.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/common-crypto-api/issues"
+    "url": "https://github.com/pecula/common-crypto-api/issues"
   },
-  "homepage": "https://github.com/yourusername/common-crypto-api#readme",
+  "homepage": "https://github.com/pecula/common-crypto-api#readme",
   "engines": {
     "node": ">=14.0.0"
   },
