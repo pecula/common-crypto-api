@@ -2,6 +2,7 @@ import { AxiosResponse, AxiosError } from 'axios';
 import { ExchangeInterface, OrderResponse, PositionResponse } from './ExchangeInterface';
 import { makeRequest } from '../utils/axiosUtils';
 import * as crypto from 'crypto-js';
+import { parsePosition, parseTrade } from './formatted/prase_binance';
 
 export class Binance implements ExchangeInterface {
   private apiKey: string;
@@ -82,53 +83,6 @@ export class Binance implements ExchangeInterface {
     }
   }
 
-  private parsePosition(position: any): PositionResponse | null {
-    const entryPrice = position.entryPrice;
-    if (entryPrice === '0' || entryPrice === '0.0' || entryPrice === '0.00000000') {
-      return null;
-    }
-
-    const notional = Math.abs(parseFloat(position.notional));
-    const contracts = parseFloat(position.positionAmt);
-    const unrealizedPnl = parseFloat(position.unRealizedProfit);
-    const leverage = parseInt(position.leverage);
-    const liquidationPrice = parseFloat(position.liquidationPrice);
-    const entryPriceFloat = parseFloat(position.entryPrice);
-    const markPrice = parseFloat(position.markPrice);
-    const collateral = Math.abs((contracts * entryPriceFloat) / leverage);
-    const initialMargin = (contracts * entryPriceFloat) / leverage;
-    const maintenanceMargin = contracts * markPrice * 0.004;
-    const marginRatio = maintenanceMargin / collateral;
-    const percentage = (unrealizedPnl / initialMargin) * 100;
-    const timestamp = parseInt(position.updateTime);
-
-    return {
-      info: position,
-      symbol: `${position.symbol.slice(0, -4)}/${position.symbol.slice(-4)}:USDT`,
-      contracts,
-      contractSize: 1,
-      unrealizedPnl,
-      leverage,
-      liquidationPrice,
-      collateral,
-      notional,
-      markPrice,
-      entryPrice: entryPriceFloat,
-      timestamp,
-      initialMargin,
-      initialMarginPercentage: 1 / leverage,
-      maintenanceMargin,
-      maintenanceMarginPercentage: 0.004,
-      marginRatio,
-      datetime: new Date(timestamp).toISOString(),
-      marginMode: position.marginType,
-      marginType: position.marginType,
-      side: position.positionSide.toLowerCase(),
-      hedged: true,
-      percentage,
-    };
-  }
-
   public async fetchPositions(): Promise<Object[]> {
     try {
       const timestamp = Date.now();
@@ -166,7 +120,7 @@ export class Binance implements ExchangeInterface {
 
       const result: PositionResponse[] = [];
       for (let i = 0; i < response.data.length; i++) {
-        const parsed = this.parsePosition(response.data[i]);
+        const parsed = parsePosition(response.data[i]);
         if (parsed !== null) {
           result.push(parsed);
         }
@@ -247,6 +201,58 @@ export class Binance implements ExchangeInterface {
 
       const response = await makeRequest('post', url, {}, this.proxyUrl, headers);
       return response.data;
+    } catch (error) {
+      throw error instanceof AxiosError ? error.response?.data : error;
+    }
+  }
+
+  public async fetchTradeHistory(symbol: string, orderId?: string, startTime?: number, endTime?: number): Promise<Object[]> {
+    try {
+      const timestamp = Date.now();
+      let queryString = `symbol=${symbol}&timestamp=${timestamp}`;
+      if (orderId) {
+        queryString += `&orderId=${orderId}`;
+      }
+      if (startTime) {
+        queryString += `&startTime=${startTime}`;
+      }
+      if (endTime) {
+        queryString += `&endTime=${endTime}`;
+      }
+      const signature = this.generateSignature(queryString, this.apiSecret);
+      const url = `${this.baseUrl}/fapi/v1/userTrades?${queryString}&signature=${signature}`;
+      const headers = {
+        'X-MBX-APIKEY': this.apiKey,
+      };
+  
+      const response = await makeRequest('get', url, {}, this.proxyUrl, headers);
+      
+      // Example response:
+      //   [
+      //     {
+      //       symbol: 'ETHUSDT',
+      //       id: 129990184,
+      //       orderId: 1467650881,
+      //       side: 'BUY',
+      //       price: '2549',
+      //       qty: '0.208',
+      //       realizedPnl: '0',
+      //       quoteQty: '530.19200',
+      //       commission: '0.21207680',
+      //       commissionAsset: 'USDT',
+      //       time: 1730763011865,
+      //       positionSide: 'LONG',
+      //       maker: false,
+      //       buyer: true
+      //     }
+      //   ]
+
+      const result: Object[] = [];
+      for (let i = 0; i < response.data.length; i++) {
+        const parsed = parseTrade(response.data[i]);
+        result.push(parsed);
+      }
+      return result;
     } catch (error) {
       throw error instanceof AxiosError ? error.response?.data : error;
     }

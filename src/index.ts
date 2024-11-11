@@ -64,4 +64,8 @@ export class CommonExchangeAPI {
   public async setMarginMode(mode: 'isolated' | 'cross', symbol: string) {
     return await this.exchange.setMarginMode(mode, symbol);
   }
+
+  public async fetchTradeHistory(symbol: string, orderId?: string, startTime?: number, endTime?: number) {
+    return await this.exchange.fetchTradeHistory(symbol, orderId, startTime, endTime);
+  }
 }

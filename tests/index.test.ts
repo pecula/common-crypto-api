@@ -82,4 +82,22 @@ describe('CommonExchangeAPI', () => {
     const result = await commonExchangeAPI.setMarginMode('isolated', 'BTCUSD');
     expect(result).toEqual(mockResponse);
   });
+
+  test('fetchTradeHistory should return trade history from Binance', async () => {
+    const mockResponse = [{ id: 1, symbol: 'BTCUSD', price: '50000', qty: '1' }];
+    Binance.prototype.fetchTradeHistory = jest.fn().mockResolvedValue(mockResponse);
+
+    const commonExchangeAPI = new CommonExchangeAPI('binance', apiKey, apiSecret);
+    const result = await commonExchangeAPI.fetchTradeHistory('BTCUSD');
+    expect(result).toEqual(mockResponse);
+  });
+
+  test('fetchTradeHistory should return trade history from Bybit', async () => {
+    const mockResponse = [{ id: 1, symbol: 'BTCUSD', price: '50000', qty: '1' }];
+    Bybit.prototype.fetchTradeHistory = jest.fn().mockResolvedValue(mockResponse);
+
+    const commonExchangeAPI = new CommonExchangeAPI('bybit', apiKey, apiSecret);
+    const result = await commonExchangeAPI.fetchTradeHistory('BTCUSD');
+    expect(result).toEqual(mockResponse);
+  });
 });
