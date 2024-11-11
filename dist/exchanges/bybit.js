@@ -192,5 +192,20 @@ class Bybit {
             }
         });
     }
+    fetchTradeHistory(symbol, orderId, startTime, endTime) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const timestamp = Date.now();
+                const params = { api_key: this.apiKey, symbol, timestamp: timestamp.toString() };
+                const signature = this.generateSignature(params);
+                const url = `${this.baseUrl}/v2/private/execution/list?${new URLSearchParams(params).toString()}&sign=${signature}`;
+                const response = yield (0, axiosUtils_1.makeRequest)("get", url, {}, this.proxyUrl);
+                return response.data;
+            }
+            catch (error) {
+                throw error instanceof axios_1.AxiosError ? error.message : "Unable to fetch trade history";
+            }
+        });
+    }
 }
 exports.Bybit = Bybit;
