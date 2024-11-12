@@ -37,3 +37,16 @@ export interface PositionResponse {
   hedged: boolean;
   percentage: number;
 }
+export interface AllOrders {
+  info: any
+  id: string;
+  clientOrderId: string;
+  symbol: string;
+  status: string;
+  side: string;
+  type: string;
+  timeInForce: string;
+  price: number;
+  cost: number;
+  reduceOnly: boolean;
+}

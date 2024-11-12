@@ -1,4 +1,4 @@
-import { PositionResponse } from "../ExchangeInterface";
+import { PositionResponse, AllOrders } from "../ExchangeInterface";
 
 export function parseTrade(trade: any): Object {
     return {
@@ -73,3 +73,22 @@ export function parseTrade(trade: any): Object {
       percentage,
     };
   }
+export function parseAllOrders(position: any): AllOrders | null {
+  const price = parseFloat(position.avgPrice);
+  const cost = parseFloat(position.cumQuote);
+
+  const allOrders: AllOrders = {
+    info: position,
+    id: position.orderId,
+    reduceOnly: position.reduceOnly,
+    side: position.side,
+    symbol: position.symbol,
+    status: position.status,
+    type: position.type,
+    timeInForce: position.timeInForce,
+    clientOrderId: position.clientOrderId,
+    price,
+    cost
+  };
+  return allOrders;
+}
