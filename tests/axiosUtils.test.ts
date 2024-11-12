@@ -53,5 +53,23 @@ describe('axiosUtils', () => {
 
       await expect(makeRequest('get', url, {}, undefined, headers)).rejects.toThrow();
     });
+
+    it('should handle 404 errors', async () => {
+      mock.onGet(url).reply(404);
+
+      await expect(makeRequest('get', url, {}, undefined, headers)).rejects.toThrow('Request failed with status code 404');
+    });
+
+    it('should handle network errors', async () => {
+      mock.onGet(url).networkError();
+
+      await expect(makeRequest('get', url, {}, undefined, headers)).rejects.toThrow('Network Error');
+    });
+
+    it('should handle timeout errors', async () => {
+      mock.onGet(url).timeout();
+
+      await expect(makeRequest('get', url, {}, undefined, headers)).rejects.toThrow('timeout of 10000ms exceeded');
+    });
   });
 });

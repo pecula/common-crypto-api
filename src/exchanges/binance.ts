@@ -66,22 +66,20 @@ export class Binance implements ExchangeInterface {
     }
   }
 
-  public async fetchClosedOrders(symbol: string): Promise<Object[]> {
+  public async fetchClosedOrders(symbol?: string): Promise<Object[]> {
     try {
       const timestamp = Date.now();
-      const queryString = `timestamp=${timestamp}`;
+      let queryString = `timestamp=${timestamp}`;
+      if (symbol != "") {
+          queryString += `&symbol=${symbol}`;
+      }
       const signature = this.generateSignature(queryString, this.apiSecret);
       const url = `${this.baseUrl}/fapi/v1/allOrders?${queryString}&signature=${signature}`;
       const headers = {
         'X-MBX-APIKEY': this.apiKey,
       };
-
       const response = await makeRequest('get', url, {}, this.proxyUrl, headers);
-      if (symbol != "") {
-        response.data = response.data.filter((elem: { symbol: string; }) => {
-          return elem.symbol == symbol;
-        })
-      }
+
       const result: AllOrders[] = [];
       for (let i = 0; i < response.data.length; i++) {
         const parsed = parseAllOrders(response.data[i]);
