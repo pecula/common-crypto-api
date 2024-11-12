@@ -57,14 +57,16 @@ export class CommonExchangeAPI {
     );
   }
 
-   public async setPositionMode(mode: 'true' | 'false', symbol: string) {
+  public async setPositionMode(mode: 'true' | 'false', symbol: string) {
     return await this.exchange.setPositionMode(mode, symbol);
   }
 
   public async setMarginMode(mode: 'isolated' | 'cross', symbol: string) {
     return await this.exchange.setMarginMode(mode, symbol);
   }
-
+  public async fetchClosedOrders(symbol: string) {
+    return await this.exchange.fetchClosedOrders(symbol);
+  }
   public async fetchTradeHistory(symbol: string, orderId?: string, startTime?: number, endTime?: number) {
     return await this.exchange.fetchTradeHistory(symbol, orderId, startTime, endTime);
   }

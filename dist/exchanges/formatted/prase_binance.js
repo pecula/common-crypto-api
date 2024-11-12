@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseTrade = parseTrade;
 exports.parsePosition = parsePosition;
+exports.parseAllOrders = parseAllOrders;
 function parseTrade(trade) {
     return {
         info: trade,
@@ -71,4 +72,22 @@ function parsePosition(position) {
         hedged: true,
         percentage,
     };
+}
+function parseAllOrders(position) {
+    const price = parseFloat(position.avgPrice);
+    const cost = parseFloat(position.cumQuote);
+    const allOrders = {
+        info: position,
+        id: position.orderId,
+        reduceOnly: position.reduceOnly,
+        side: position.side,
+        symbol: position.symbol,
+        status: position.status,
+        type: position.type,
+        timeInForce: position.timeInForce,
+        clientOrderId: position.clientOrderId,
+        price,
+        cost
+    };
+    return allOrders;
 }

@@ -98,23 +98,93 @@ class Binance {
             }
         });
     }
-    fetchAllOrders() {
+    fetchClosedOrders(symbol) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
                 const timestamp = Date.now();
                 const queryString = `timestamp=${timestamp}`;
                 const signature = this.generateSignature(queryString, this.apiSecret);
-                const url = `${this.baseUrl}/v1/allOrders?${queryString}&signature=${signature}`;
+                const url = `${this.baseUrl}/fapi/v1/allOrders?${queryString}&signature=${signature}`;
                 const headers = {
                     'X-MBX-APIKEY': this.apiKey,
                 };
                 const response = yield (0, axiosUtils_1.makeRequest)('get', url, {}, this.proxyUrl, headers);
-                return response.data;
+                if (symbol != "") {
+                    response.data = response.data.filter((elem) => {
+                        return elem.symbol == symbol;
+                    });
+                }
+                const result = [];
+                for (let i = 0; i < response.data.length; i++) {
+                    const parsed = (0, prase_binance_1.parseAllOrders)(response.data[i]);
+                    if (parsed !== null) {
+                        result.push(parsed);
+                    }
+                }
+                return result;
             }
             catch (error) {
                 throw error instanceof axios_1.AxiosError ? (_a = error.response) === null || _a === void 0 ? void 0 : _a.data : error;
             }
+            /*
+            [
+           {
+             info: {
+               orderId: '4066137237',
+               symbol: 'BTCUSDT',
+               status: 'FILLED',
+               clientOrderId: 'web_AAnDicEckiUFMDO2xLRe',
+               price: '0',
+               avgPrice: '90369.70000',
+               origQty: '0.002',
+               executedQty: '0.002',
+               cumQuote: '180.73940',
+               timeInForce: 'GTC',
+               type: 'MARKET',
+               reduceOnly: false,
+               closePosition: false,
+               side: 'BUY',
+               positionSide: 'BOTH',
+               stopPrice: '0',
+               workingType: 'CONTRACT_PRICE',
+               priceMatch: 'NONE',
+               selfTradePreventionMode: 'NONE',
+               goodTillDate: '0',
+               priceProtect: false,
+               origType: 'MARKET',
+               time: '1731382930786',
+               updateTime: '1731382930786'
+             },
+             id: '4066137237',
+             clientOrderId: 'web_AAnDicEckiUFMDO2xLRe',
+             timestamp: 1731382930786,
+             datetime: '2024-11-12T03:42:10.786Z',
+             lastTradeTimestamp: 1731382930786,
+             lastUpdateTimestamp: 1731382930786,
+             symbol: 'BTC/USDT:USDT',
+             type: 'market',
+             timeInForce: 'GTC',
+             postOnly: false,
+             reduceOnly: false,
+             side: 'buy',
+             price: 90369.7,
+             triggerPrice: undefined,
+             amount: 0.002,
+             cost: 180.7394,
+             average: 90369.7,
+             filled: 0.002,
+             remaining: 0,
+             status: 'closed',
+             fee: undefined,
+             trades: [],
+             fees: [],
+             stopPrice: undefined,
+             takeProfitPrice: undefined,
+             stopLossPrice: undefined
+           }
+         ]
+            */
         });
     }
     fetchPositions() {

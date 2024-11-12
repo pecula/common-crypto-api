@@ -111,6 +111,16 @@ class Bybit {
             }
         });
     }
+    fetchClosedOrders() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return [];
+            }
+            catch (error) {
+                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to fetch all orders';
+            }
+        });
+    }
     fetchPositions() {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
