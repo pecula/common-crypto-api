@@ -50,3 +50,37 @@ export interface AllOrders {
   cost: number;
   reduceOnly: boolean;
 }
+export interface parseLoadmarketesPrice {
+  min: number;
+  max: number;
+}
+export interface ParseLoadmarketesLimits {
+  price: parseLoadmarketesPrice;
+  amount: parseLoadmarketesPrice;
+  cost: parseLoadmarketesPrice;
+  market: parseLoadmarketesPrice;
+}
+
+export interface ConvertedItem {
+  [key: string]: {
+    id: string;
+    base: string;
+    baseId: string;
+    quote: string;
+    quoteId: string;
+    status: string;
+    spot: boolean;
+    margin: boolean;
+    limits: ParseLoadmarketesLimits;
+  };
+}
+export interface FetchTicker {
+  info: any
+  symbol: string;
+  high: number;
+  low: number;
+  open: number;
+  close: number;
+  last: number;
+  change: number;
+}

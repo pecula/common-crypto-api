@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseTrade = parseTrade;
 exports.parsePosition = parsePosition;
 exports.parseAllOrders = parseAllOrders;
+exports.parseLoadmarketes = parseLoadmarketes;
 function parseTrade(trade) {
     return {
         info: trade,
@@ -90,4 +91,43 @@ function parseAllOrders(position) {
         cost
     };
     return allOrders;
+}
+function parseLoadmarketes(position) {
+    const symbolsArray = position.symbols;
+    const result = symbolsArray.reduce((acc, item) => {
+        let max;
+        let min;
+        let parseLoadmarketesLimits = { price: { min: 0, max: 0 }, amount: { min: 0, max: 0 }, cost: { min: 0, max: 0 }, market: { min: 0, max: 0 } };
+        for (const elem of item.filters) {
+            if (elem.filterType == "PRICE_FILTER") {
+                parseLoadmarketesLimits.price.max = parseFloat(elem.maxPrice);
+                parseLoadmarketesLimits.price.min = parseFloat(elem.minPrice);
+            }
+            else if (elem.filterType == "LOT_SIZE") {
+                parseLoadmarketesLimits.amount.max = parseFloat(elem.maxQty);
+                parseLoadmarketesLimits.amount.min = parseFloat(elem.minQty);
+            }
+            else if (elem.filterType == "NOTIONAL") {
+                parseLoadmarketesLimits.cost.max = parseFloat(elem.maxNotional);
+                parseLoadmarketesLimits.cost.min = parseFloat(elem.minNotional);
+            }
+            else if (elem.filterType == "MARKET_LOT_SIZE") {
+                parseLoadmarketesLimits.market.max = parseFloat(elem.maxQty);
+                parseLoadmarketesLimits.market.min = parseFloat(elem.minQty);
+            }
+        }
+        acc[`${item.baseAsset}/${item.quoteAsset}`] = {
+            id: item.symbol,
+            status: item.status,
+            base: item.baseAsset,
+            baseId: item.baseAsset,
+            quote: item.quoteAsset,
+            quoteId: item.quoteAsset,
+            spot: item.isSpotTradingAllowed,
+            margin: item.isMarginTradingAllowed,
+            limits: parseLoadmarketesLimits,
+        };
+        return acc;
+    }, {});
+    return result;
 }

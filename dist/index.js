@@ -61,6 +61,16 @@ class CommonExchangeAPI {
             return yield this.exchange.fetchClosedOrders(symbol);
         });
     }
+    fetchTicker(symbol) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.exchange.fetchTicker(symbol);
+        });
+    }
+    loadMarkets() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.exchange.loadMarkets();
+        });
+    }
     fetchTradeHistory(symbol, orderId, startTime, endTime) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.exchange.fetchTradeHistory(symbol, orderId, startTime, endTime);

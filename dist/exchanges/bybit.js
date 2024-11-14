@@ -121,6 +121,26 @@ class Bybit {
             }
         });
     }
+    loadMarkets() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return [];
+            }
+            catch (error) {
+                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to load marketes';
+            }
+        });
+    }
+    fetchTicker() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                return [];
+            }
+            catch (error) {
+                throw error instanceof axios_1.AxiosError ? error.message : 'Unable to load fetchTicker';
+            }
+        });
+    }
     fetchPositions() {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;

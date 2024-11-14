@@ -103,18 +103,16 @@ class Binance {
             var _a;
             try {
                 const timestamp = Date.now();
-                const queryString = `timestamp=${timestamp}`;
+                let queryString = `timestamp=${timestamp}`;
+                if (symbol != "") {
+                    queryString += `&symbol=${symbol}`;
+                }
                 const signature = this.generateSignature(queryString, this.apiSecret);
                 const url = `${this.baseUrl}/fapi/v1/allOrders?${queryString}&signature=${signature}`;
                 const headers = {
                     'X-MBX-APIKEY': this.apiKey,
                 };
                 const response = yield (0, axiosUtils_1.makeRequest)('get', url, {}, this.proxyUrl, headers);
-                if (symbol != "") {
-                    response.data = response.data.filter((elem) => {
-                        return elem.symbol == symbol;
-                    });
-                }
                 const result = [];
                 for (let i = 0; i < response.data.length; i++) {
                     const parsed = (0, prase_binance_1.parseAllOrders)(response.data[i]);
@@ -355,6 +353,85 @@ class Binance {
                     const parsed = (0, prase_binance_1.parseTrade)(response.data[i]);
                     result.push(parsed);
                 }
+                return result;
+            }
+            catch (error) {
+                throw error instanceof axios_1.AxiosError ? (_a = error.response) === null || _a === void 0 ? void 0 : _a.data : error;
+            }
+        });
+    }
+    loadMarkets() {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                // const url = `${this.baseUrl}/api/v3/exchangeInfo`;
+                const url = `https://api.binance.com/api/v3/exchangeInfo`;
+                const response = yield (0, axiosUtils_1.makeRequest)('get', url, {}, this.proxyUrl, {});
+                const parsed = (0, prase_binance_1.parseLoadmarketes)(response.data);
+                return parsed;
+            }
+            catch (error) {
+                throw error instanceof axios_1.AxiosError ? (_a = error.response) === null || _a === void 0 ? void 0 : _a.data : error;
+            }
+        });
+    }
+    fetchTicker(symbol) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a;
+            try {
+                let queryString = `symbol=${symbol}`;
+                const url = `${this.baseUrl}/fapi/v1/ticker/24hr?${queryString}`;
+                const headers = {
+                    'X-MBX-APIKEY': this.apiKey,
+                };
+                /*
+                {
+                  symbol: 'ETH/USDT:USDT',
+                  timestamp: 1731500294710,
+                  datetime: '2024-11-13T12:18:14.710Z',
+                  high: 3449.99,
+                  low: 3035,
+                  bid: undefined,
+                  bidVolume: undefined,
+                  ask: undefined,
+                  askVolume: undefined,
+                  vwap: 3198.14,
+                  open: 3186.75,
+                  close: 3206.57,
+                  last: 3206.57,
+                  previousClose: undefined,
+                  change: 19.82,
+                  percentage: 0.622,
+                  average: 3196.66,
+                  baseVolume: 26024.135,
+                  quoteVolume: 83228913.11,
+                  info: {
+                    symbol: 'ETHUSDT',
+                    priceChange: '19.82',
+                    priceChangePercent: '0.622',
+                    weightedAvgPrice: '3198.14',
+                    lastPrice: '3206.57',
+                    lastQty: '0.046',
+                    openPrice: '3186.75',
+                    highPrice: '3449.99',
+                    lowPrice: '3035.00',
+                    volume: '26024.135',
+                    quoteVolume: '83228913.11',
+                    openTime: '1731413880000',
+                    closeTime: '1731500294710',
+                    firstId: '130075327',
+                    lastId: '130086703',
+                    count: '11315'
+                  }
+                }
+                */
+                const response = yield (0, axiosUtils_1.makeRequest)('get', url, {}, this.proxyUrl, headers);
+                let open = parseFloat(response.data.openPrice);
+                let low = parseFloat(response.data.lowPrice);
+                let high = parseFloat(response.data.highPrice);
+                let close = parseFloat(response.data.lastPrice);
+                let change = parseFloat(response.data.priceChange);
+                const result = { info: response.data, symbol: response.data.symbol, high, low, open: open, close, last: close, change };
                 return result;
             }
             catch (error) {
