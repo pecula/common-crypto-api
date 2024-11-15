@@ -18,21 +18,20 @@ const axios_1 = __importDefault(require("axios"));
 const https_proxy_agent_1 = require("https-proxy-agent");
 const makeRequest = (method_1, url_1, ...args_1) => __awaiter(void 0, [method_1, url_1, ...args_1], void 0, function* (method, url, data = {}, proxyUrl, headers = {}) {
     try {
-        let axiosInstance = axios_1.default;
-        if (proxyUrl) {
-            const agent = new https_proxy_agent_1.HttpsProxyAgent(proxyUrl);
-            axiosInstance = axios_1.default.create({
-                baseURL: url,
-                httpsAgent: agent,
-                timeout: 10000,
-            });
-        }
-        const response = yield axiosInstance({
+        const config = {
             method,
             url,
             headers: Object.assign({}, headers),
-            //   data: method === "post" ? data : undefined,
-        });
+            timeout: 10000,
+        };
+        if (proxyUrl) {
+            const agent = new https_proxy_agent_1.HttpsProxyAgent(proxyUrl);
+            config.httpsAgent = agent;
+        }
+        // if (method === "post") {
+        //   config.data = data;
+        // }
+        const response = yield (0, axios_1.default)(config);
         return response;
     }
     catch (error) {
