@@ -90,6 +90,20 @@ export class Bybit implements ExchangeInterface {
       throw error instanceof AxiosError ? error.message : 'Unable to fetch all orders';
     }
   }
+  public async loadMarkets(): Promise<Object[]> {
+    try {
+      return [];
+    } catch (error) {
+      throw error instanceof AxiosError ? error.message : 'Unable to load marketes';
+    }
+  }
+  public async fetchTicker(): Promise<Object[]> {
+    try {
+      return [];
+    } catch (error) {
+      throw error instanceof AxiosError ? error.message : 'Unable to load fetchTicker';
+    }
+  }
   public async fetchPositions(): Promise<Object[]> {
     try {
       const timestamp = Date.now();

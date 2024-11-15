@@ -67,6 +67,12 @@ export class CommonExchangeAPI {
   public async fetchClosedOrders(symbol?: string) {
     return await this.exchange.fetchClosedOrders(symbol);
   }
+  public async fetchTicker(symbol: string) {
+    return await this.exchange.fetchTicker(symbol);
+  }
+  public async loadMarkets() {
+    return await this.exchange.loadMarkets();
+  }
   public async fetchTradeHistory(symbol: string, orderId?: string, startTime?: number, endTime?: number) {
     return await this.exchange.fetchTradeHistory(symbol, orderId, startTime, endTime);
   }

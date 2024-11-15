@@ -1,8 +1,8 @@
 import { AxiosResponse, AxiosError } from 'axios';
-import { ExchangeInterface, OrderResponse, PositionResponse, AllOrders } from './ExchangeInterface';
+import { ExchangeInterface, OrderResponse, PositionResponse, AllOrders, FetchTicker } from './ExchangeInterface';
 import { makeRequest } from '../utils/axiosUtils';
 import * as crypto from 'crypto-js';
-import { parsePosition, parseTrade, parseAllOrders } from './formatted/prase_binance';
+import { parsePosition, parseTrade, parseAllOrders, parseLoadmarketes } from './formatted/prase_binance';
 
 export class Binance implements ExchangeInterface {
   private apiKey: string;
@@ -320,6 +320,79 @@ export class Binance implements ExchangeInterface {
         const parsed = parseTrade(response.data[i]);
         result.push(parsed);
       }
+      return result;
+    } catch (error) {
+      throw error instanceof AxiosError ? error.response?.data : error;
+    }
+  }
+  public async loadMarkets(): Promise<Object[]> {
+    try {
+      // const url = `${this.baseUrl}/api/v3/exchangeInfo`;
+      const url = `https://api.binance.com/api/v3/exchangeInfo`;
+
+      const response = await makeRequest('get', url, {}, this.proxyUrl, {});
+      const parsed = parseLoadmarketes(response.data);
+      return parsed;
+    } catch (error) {
+      throw error instanceof AxiosError ? error.response?.data : error;
+    }
+  }
+  public async fetchTicker(symbol: string): Promise<Object> {
+    try {
+      let queryString = `symbol=${symbol}`;
+      const url = `${this.baseUrl}/fapi/v1/ticker/24hr?${queryString}`;
+      const headers = {
+        'X-MBX-APIKEY': this.apiKey,
+      };
+      /*
+      {
+        symbol: 'ETH/USDT:USDT',
+        timestamp: 1731500294710,
+        datetime: '2024-11-13T12:18:14.710Z',
+        high: 3449.99,
+        low: 3035,
+        bid: undefined,
+        bidVolume: undefined,
+        ask: undefined,
+        askVolume: undefined,
+        vwap: 3198.14,
+        open: 3186.75,
+        close: 3206.57,
+        last: 3206.57,
+        previousClose: undefined,
+        change: 19.82,
+        percentage: 0.622,
+        average: 3196.66,
+        baseVolume: 26024.135,
+        quoteVolume: 83228913.11,
+        info: {
+          symbol: 'ETHUSDT',
+          priceChange: '19.82',
+          priceChangePercent: '0.622',
+          weightedAvgPrice: '3198.14',
+          lastPrice: '3206.57',
+          lastQty: '0.046',
+          openPrice: '3186.75',
+          highPrice: '3449.99',
+          lowPrice: '3035.00',
+          volume: '26024.135',
+          quoteVolume: '83228913.11',
+          openTime: '1731413880000',
+          closeTime: '1731500294710',
+          firstId: '130075327',
+          lastId: '130086703',
+          count: '11315'
+        }
+      }
+      */
+      const response = await makeRequest('get', url, {}, this.proxyUrl, headers);
+      let open = parseFloat(response.data.openPrice);
+      let low = parseFloat(response.data.lowPrice);
+      let high = parseFloat(response.data.highPrice);
+      let close = parseFloat(response.data.lastPrice);
+      let change = parseFloat(response.data.priceChange);
+      const result: FetchTicker = { info: response.data, symbol: response.data.symbol, high, low, open: open, close, last: close, change };
+
       return result;
     } catch (error) {
       throw error instanceof AxiosError ? error.response?.data : error;
